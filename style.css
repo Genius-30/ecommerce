@@ -274,10 +274,128 @@ main {
   cursor: pointer;
 }
 
+#order-dialog::backdrop {
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+#order-dialog {
+  width: 25vw;
+  align-self: center;
+  justify-self: center;
+  padding: 25px 20px;
+  border-radius: 20px;
+  border: 2px solid #030e12;
+  color: #030e12;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #fcde67;
+}
+
+#order-dialog p {
+  font-size: 0.9rem;
+}
+
+#dialog-total {
+  font-size: 1.2rem;
+  color: rgb(238, 0, 0);
+}
+
+#form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#form input {
+  height: 40px;
+  outline: none;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: inherit;
+}
+
+#form input:focus {
+  border: 2px solid #030e12;
+}
+
+.order-btns {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+}
+
+.order-btns button {
+  cursor: pointer;
+  padding: 12px 10px;
+  border-radius: 8px;
+  outline: none;
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.order-btns button:first-child {
+  flex-basis: 70%;
+  background-color: #030e12;
+  color: azure;
+}
+
+.order-btns button:first-child:hover {
+  background-color: #092732;
+}
+
+.order-btns button:nth-child(2) {
+  flex-basis: 30%;
+  background-color: azure;
+  color: #030e12;
+}
+
+#order-dialog-content,
+#order-dialog-message {
+  text-align: center;
+}
+
+#order-dialog-message.hidden {
+  display: none;
+}
+
+#order-dialog-message {
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.order-message-text {
+  margin: 0;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.order-message-text.waiting {
+  color: #333;
+}
+
+.order-message-text.success {
+  color: #4caf50;
+}
+
+.order-message-text.failure {
+  color: rgb(238, 0, 0);
+}
+
+@media(max-width: 1200px) {
+  #order-dialog {
+    width: 40vw;
+  }
+}
+
 @media(max-width: 960px) {
-  /* .products-container {
-    grid-template-columns: repeat(2, 1fr);
-  } */
+  #order-dialog {
+    width: 50vw;
+  }
 }
 
 @media(max-width: 820px) {
@@ -347,15 +465,9 @@ main {
     margin-top: 70px;
   }
 
-  /* .products-container {
-    grid-template-columns: repeat(2, 1fr);
-  } */
-}
-
-@media(max-width: 540px) {
-  /* .products-container {
-    grid-template-columns: 1fr;
-  } */
+  #order-dialog {
+    width: 70vw;
+  }
 }
 
 @media(max-width: 400px) {
@@ -368,5 +480,9 @@ main {
   .cart-container {
     width: 90%;
     right: 8px;
+  }
+
+  #order-dialog {
+    width: 90vw;
   }
 }

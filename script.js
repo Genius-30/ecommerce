@@ -77,6 +77,11 @@ productsContainer.innerHTML = products
   .join("");
 
 let cart = [];
+const cartItemsContainer = document.querySelector(".cart-items");
+
+if (cart.length == 0) {
+  cartItemsContainer.innerHTML = `<li>Your cart is empty!</li>`;
+}
 
 document.querySelectorAll(".add-to-cart-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -86,19 +91,15 @@ document.querySelectorAll(".add-to-cart-btn").forEach((btn) => {
 });
 
 function updateCartUI() {
-  const cartItemsContainer = document.querySelector(".cart-items");
   cartItemsContainer.innerHTML = "";
 
-  if (cart.length === 0) {
-    cartItemsContainer.innerHTML = `<li class="empty-cart-message">Your cart is empty</li>`;
-  } else {
-    cart.forEach((item) => {
-      const cartItem = document.createElement("li");
-      cartItem.innerHTML = `<div class="cart-product-img-title-container">
+  cart.forEach((item) => {
+    const cartItem = document.createElement("li");
+    cartItem.innerHTML = `<div class="cart-product-img-title-container">
           <div>
             <img src="${item.image}" class="cart-product-image" alt="${
-        item.title
-      }">
+      item.title
+    }">
           </div>
           <h3>${item.title}</h3>
         </div>
@@ -109,14 +110,13 @@ function updateCartUI() {
         </div>
         <p id="cart-product-price">$ ${item.price.toFixed(2)}</p>
       `;
-      cartItemsContainer.appendChild(cartItem);
+    cartItemsContainer.appendChild(cartItem);
 
-      updateCartCount();
-      updateCartTotal();
+    updateCartCount();
+    updateCartTotal();
 
-      attachEventListeners();
-    });
-  }
+    attachEventListeners();
+  });
 }
 
 function attachEventListeners() {
@@ -160,14 +160,17 @@ function updateCartCount() {
   cartCount.textContent = totalItems;
 }
 
+let finalPrice;
+
 function updateCartTotal() {
   const cartTotal = document.querySelector("#cart-total");
   const totalPrice = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  console.log(totalPrice);
-  cartTotal.textContent = `$ ${totalPrice.toFixed(2)}`;
+  finalPrice = `$ ${totalPrice.toFixed(2)}`;
+  cartTotal.textContent = finalPrice;
+  document.getElementById("dialog-total").innerHTML = finalPrice;
 }
 
 function changeQuantity(productId, count) {
@@ -193,4 +196,109 @@ cartIcon.addEventListener("click", () => {
   } else if (document.selection) {
     document.selection.empty();
   }
+});
+
+const dialog = document.getElementById("order-dialog");
+const purchaseBtn = document.getElementById("purchase-btn");
+const closeBtn = document.getElementById("close-dialog");
+const orderElement = document.getElementById("order-id");
+
+function generateOrderId() {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let orderId = "";
+
+  for (let i = 0; i < 16; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    orderId += characters[randomIndex];
+  }
+
+  return orderId;
+}
+
+const orderId = generateOrderId();
+
+purchaseBtn.addEventListener("click", () => {
+  if (cart.length !== 0) {
+    cartContainer.style.display = "none";
+    orderElement.innerHTML = orderId;
+    dialog.showModal();
+  }
+});
+
+const form = document.getElementById("form");
+const orderDialog = document.getElementById("order-dialog");
+const orderDialogContent = document.getElementById("order-dialog-content");
+const orderDialogMessage = document.getElementById("order-dialog-message");
+const orderMessageText = document.getElementById("order-message-text");
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  orderDialogContent.classList.add("hidden");
+  orderDialogMessage.classList.remove("hidden");
+
+  orderMessageText.textContent = "Please wait...";
+  orderMessageText.className = "order-message-text waiting";
+
+  const formData = new FormData(form);
+  const object = Object.fromEntries(formData);
+  const htmlMessage = `Order Confirmation
+  Thank you for your order!
+
+  Order ID: '${orderId}'
+  Total: ${finalPrice}
+  Shipping Address: ${object.address}
+
+  If you have any questions, please contact us.
+
+  Thank you for shopping with us!`;
+
+  const body = {
+    access_key: object.access_key,
+    email: object.email,
+    subject: "Order Confirmation",
+    message: htmlMessage,
+  };
+  const json = JSON.stringify(body);
+
+  fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: json,
+  })
+    .then(async (response) => {
+      let json = await response.json();
+      if (response.status == 200) {
+        orderMessageText.textContent = "Order placed successfully!";
+        orderMessageText.className = "order-message-text success";
+        cart = [];
+        updateCartTotal();
+        updateCartCount();
+        updateCartUI();
+        cartItemsContainer.innerHTML = `<li>Your cart is empty!</li>`;
+      } else {
+        orderMessageText.textContent = json.message;
+        orderMessageText.className = "order-message-text failure";
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      orderMessageText.textContent = "Something went wrong!";
+      orderMessageText.className = "order-message-text failure";
+    })
+    .then(function () {
+      form.reset();
+      setTimeout(() => {
+        orderDialog.close();
+        orderDialogMessage.classList.add("hidden");
+        orderDialogContent.classList.remove("hidden");
+        orderMessageText.className = "order-message-text waiting";
+      }, 3000);
+    });
+});
+
+closeBtn.addEventListener("click", () => {
+  dialog.close();
 });

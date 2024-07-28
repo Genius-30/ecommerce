@@ -42,6 +42,26 @@
     </div>
   </main>
 
+  <dialog id="order-dialog">
+    <div id="order-dialog-content">
+      <h2>Order Details</h2>
+      <p>Order ID: <span id="order-id">123456</span></p>
+      <p>Total: <span id="dialog-total">$ 0.00</span></p>
+      <form method="POST" id="form">
+        <input type="hidden" name="access_key" value="41657574-3156-4759-bdbd-7fd9c8ce1471">
+        <input type="email" name="email" id="user-email" placeholder="example@gmail.com" required>
+        <input type="text" name="address" id="user-address" placeholder="01, street, city (state)" required>
+        <div class="order-btns">
+          <button type="submit" id="confirm-btn">Confirm Order</button>
+          <button id="close-dialog">Close</button>
+        </div>
+      </form>
+    </div>
+    <div id="order-dialog-message" class="hidden">
+      <p id="order-message-text" class="order-message-text">Please wait...</p>
+    </div>
+  </dialog>
+
   <script src="script.js"></script>
 </body>
 
